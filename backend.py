@@ -1,17 +1,13 @@
+import streamlit as st
 import requests
-from flask import Flask, request, jsonify
-from flask_cors import CORS
 import logging
 
-# Set up logging for debugging
+# Set up logging
 logging.basicConfig(level=logging.INFO)
 
 # AIML API details
 API_KEY = "6ed1008879fc4c8a8904e99dd1b29542"
 BASE_URL = "https://api.aimlapi.com/v1/chat/completions"
-
-app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend communication
 
 SYSTEM_PROMPT = """
 You are a financial assistant chatbot for a FinTech company.
@@ -19,31 +15,36 @@ You provide accurate information about loans, interest rates, credit bureaus, cr
 Ensure responses are factual, concise, and helpful.
 """
 
-@app.route("/", methods=["GET"])
-def home():
-    return "Welcome to the We Credit Assistant Chatbot API!"
+# Streamlit UI
+st.title("💰 We Credit Assistant Chatbot")
+st.caption("📢 Ask financial queries related to loans, interest rates, and credit reports.")
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    # Validate Content-Type
-    if request.content_type != "application/json":
-        return jsonify({"error": "Unsupported Media Type: Use application/json"}), 415
+# Sidebar configuration
+with st.sidebar:
+    st.header("⚙️ Chatbot Settings")
+    temperature = st.slider("Response Creativity (Temperature)", 0.0, 1.0, 0.7)
 
-    # Get request data
-    data = request.get_json()
-    if not data or "user_message" not in data:
-        return jsonify({"error": "Invalid request, missing 'user_message'"}), 400
+# Initialize chat history
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
-    user_message = data["user_message"]
+# Display chat history
+for chat in st.session_state.chat_history:
+    with st.chat_message(chat["role"]):
+        st.markdown(chat["content"])
 
-    # Prepare API request
+# User input
+user_message = st.chat_input("Ask your financial question...")
+
+def get_ai_response(user_input):
+    """Sends user input to AIML API and returns the chatbot's response."""
     payload = {
         "model": "gpt-4",
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_message}
+            {"role": "user", "content": user_input}
         ],
-        "temperature": 0.7
+        "temperature": temperature
     }
     
     headers = {
@@ -57,13 +58,20 @@ def chat():
         response_data = response.json()
 
         # Extract AI response
-        ai_response = response_data.get("choices", [{}])[0].get("message", {}).get("content", "No response received.")
-
-        return jsonify({"response": ai_response})
-
+        return response_data.get("choices", [{}])[0].get("message", {}).get("content", "No response received.")
+    
     except requests.exceptions.RequestException as e:
         logging.error(f"API request failed: {e}")
-        return jsonify({"error": "Failed to connect to AIML API"}), 500
+        return "🚨 API Error: Unable to fetch response."
 
-if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+if user_message:
+    # Display user message
+    st.session_state.chat_history.append({"role": "user", "content": user_message})
+    
+    # Get AI response
+    with st.spinner("🤖 Generating response..."):
+        ai_response = get_ai_response(user_message)
+
+    # Display AI response
+    st.session_state.chat_history.append({"role": "ai", "content": ai_response})
+    st.rerun()
