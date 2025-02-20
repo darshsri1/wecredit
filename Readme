@@ -1,0 +1,20 @@
+# 💰 We Credit Assistant Chatbot
+
+We Credit Assistant Chatbot is an AI-powered financial assistant designed to help users with queries related to **loans, interest rates, credit scores, and credit reports**. It provides accurate, concise, and helpful responses based on the latest financial information.
+
+## 🚀 Features
+- **💬 Real-time AI Chatbot** – Get instant answers to financial queries.
+- **🎨 Customizable AI Creativity** – Adjust response creativity using a slider.
+- **🖤 Modern UI** – Dark-themed interface with stylish chat bubbles.
+- **⚡ Fast & Responsive** – Optimized for quick and smooth interactions.
+- **📊 Secure API Integration** – Uses OpenAI-compatible API for responses.
+
+---
+
+## 🛠️ Tech Stack
+- **Frontend**: Streamlit (Python)
+- **Backend**: Flask API (optional) or direct AIML API
+- **AI Model**: GPT-4 (via AIML API)
+- **Styling**: Custom CSS for chat bubbles
+
+---
