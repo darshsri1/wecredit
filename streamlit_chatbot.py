@@ -3,31 +3,31 @@ import requests
 import time
 import logging
 
-# Set up logging
+
 logging.basicConfig(level=logging.INFO)
 
-# AIML API details
+
 API_KEY = "6ed1008879fc4c8a8904e99dd1b29542"
 BASE_URL = "https://api.aimlapi.com/v1/chat/completions"
 
-# System prompt
+
 SYSTEM_PROMPT = """
 You are a financial assistant chatbot for a FinTech company.
 You provide accurate information about loans, interest rates, credit bureaus, credit reports, and CIBIL.
 Ensure responses are factual, concise, and helpful.
 """
 
-# Streamlit UI setup
+
 st.set_page_config(page_title="We Credit Assistant", layout="centered")
 
-# Sidebar branding
+
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=100)
     st.title("💰 We Credit Assistant")
     st.markdown("A smart chatbot to answer your financial queries!")
     temperature = st.slider("🎨 AI Creativity Level", 0.0, 1.0, 0.7)
 
-# Custom CSS for enhanced UI
+
 st.markdown("""
     <style>
     body {
@@ -69,11 +69,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Initialize chat history
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display chat history
+
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 for msg in st.session_state.messages:
     role_class = "user-message" if msg["role"] == "user" else "assistant-message"
@@ -81,7 +81,7 @@ for msg in st.session_state.messages:
     st.markdown(f'<div class="message-container {align_class}"><div class="{role_class}">{msg["content"]}</div></div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# User input
+
 user_input = st.chat_input("💬 Ask about loans, interest rates, or credit scores...")
 
 def get_ai_response(user_text):
@@ -110,18 +110,18 @@ def get_ai_response(user_text):
         return "🚨 API Error: Unable to fetch response."
 
 if user_input:
-    # Add user message
+    
     st.session_state.messages.append({"role": "user", "content": user_input})
     st.markdown(f'<div class="message-container user"><div class="user-message">{user_input}</div></div>', unsafe_allow_html=True)
 
-    # AI response
+    
     with st.spinner("🤖 Thinking..."):
         time.sleep(1)  # Simulating processing delay
         ai_response = get_ai_response(user_input)
 
-    # Add AI response
+    
     st.session_state.messages.append({"role": "assistant", "content": ai_response})
     st.markdown(f'<div class="message-container assistant"><div class="assistant-message">{ai_response}</div></div>', unsafe_allow_html=True)
 
-    # Refresh UI
+  
     st.rerun()
